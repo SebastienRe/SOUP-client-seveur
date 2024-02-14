@@ -1,9 +1,12 @@
 module Soup
 {
-    struct Song {
+    sequence<byte> songdatas;
+    
+    struct Song{
         string title;
         string author;
-        sequence<byte> data;
+        string extension;
+        songdatas songData;
     }
 
     interface MusicLibrary
