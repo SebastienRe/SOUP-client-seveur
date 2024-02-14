@@ -1,0 +1,6 @@
+node_modules
+.venv
+serveur/Soup_ice.py
+serveur/Soup
+client/Soup.js
+serveur/__pycache__
