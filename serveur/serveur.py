@@ -50,7 +50,7 @@ class SongFiles():
             
             # lecture des données binaires du fichier
             donnees = None
-            with open(f"{self.dossier}/{fichier}", "rb") as f:
+            with open(f"{self.dossier_musiques}/{fichier}", "rb") as f:
                 donnees = f.read()
             #donnees est de type bytes
             
@@ -77,10 +77,11 @@ class MusicLibraryI(Soup.MusicLibrary):
         self.musiques[song.id] = song
 
     def searchByTitle(self, title, current=None)->list[Song]:
-        return [song for song in self.musiques.values() if song.titre == title]
+        print(self.musiques)
+        return [song for song in self.musiques.values() if song.title == title]
 
     def searchByAuthor(self, author, current=None)->list[Song]:
-        return [song for song in self.musiques.values() if song.auteur == author]
+        return [song for song in self.musiques.values() if song.author == author]
 
 with Ice.initialize() as communicator:
     adapter = communicator.createObjectAdapterWithEndpoints("MusicLibraryAdapter", "default -p 10000") # Création de l'adaptateur qui sert à communiquer avec le client

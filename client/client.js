@@ -1,7 +1,7 @@
 const Ice = require('ice').Ice;
 const Soup = require('./Soup').Soup;
 
-(async function() {
+async function main() {
     let communicator;
     try {
         communicator = Ice.initialize(process.argv);
@@ -12,9 +12,8 @@ const Soup = require('./Soup').Soup;
         }
 
         // Utilisez musicLibrary pour appeler les méthodes sur le serveur
-        // Par exemple, pour ajouter une chanson :
-        const song = new Soup.Song('Titre', 'Auteur', 'mp3', Ice.ByteSeq.fromArray(Buffer.from('données de la chanson', 'utf-8')));
-        await musicLibrary.addSong(song);
+        const songs = await musicLibrary.searchByTitle('Zeus');
+        console.log(songs);
     } catch (ex) {
         console.error(ex.toString());
         process.exitCode = 1;
@@ -23,4 +22,6 @@ const Soup = require('./Soup').Soup;
             await communicator.destroy();
         }
     }
-}());
+}
+
+main();

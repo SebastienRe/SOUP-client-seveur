@@ -3,7 +3,7 @@ module Soup
     sequence<byte> songdatas;
     
     struct Song{
-        long id;
+        int id;
         string title;
         string author;
         string extension;
