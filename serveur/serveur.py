@@ -24,7 +24,7 @@ class SongFiles():
         for fichier in fichiers:
             id_fichier, titre, auteur_and_ext = fichier.split("-")
             if int(id_fichier) == song.id:
-                os.remove(f"{self.dossier}/{fichier}")
+                os.remove(os.path.join(self.dossier_musiques, fichier))
                 return
     
     def modifierMusique(self, song: Song):
@@ -62,26 +62,23 @@ class SongFiles():
 class MusicLibraryI(Soup.MusicLibrary):
     def __init__(self):
         self.songfiles = SongFiles()
-        self.musiques : dict[int, Song] = self.songfiles.getAlldossier_musiques()
         
     def addSong(self, song : Song, current=None):
         self.songfiles.ajouterMusique(song)
-        self.musiques[song.id] = song
         
     def removeSong(self, song : Song, current=None):
         self.songfiles.supprimerMusique(song)
-        del self.musiques[song.id]
 
     def updateSong(self, song : Soup, current=None):
         self.songfiles.modifierMusique(song)
-        self.musiques[song.id] = song
 
     def searchByTitle(self, title, current=None)->list[Song]:
-        print(self.musiques)
-        return [song for song in self.musiques.values() if song.title == title]
+        songs = self.songfiles.getAlldossier_musiques()
+        return [song for song in songs.values() if song.title == title]
 
     def searchByAuthor(self, author, current=None)->list[Song]:
-        return [song for song in self.musiques.values() if song.author == author]
+        songs = self.songfiles.getAlldossier_musiques()
+        return [song for song in songs.values() if song.author == author]
 
 with Ice.initialize() as communicator:
     adapter = communicator.createObjectAdapterWithEndpoints("MusicLibraryAdapter", "default -p 10000") # Création de l'adaptateur qui sert à communiquer avec le client
