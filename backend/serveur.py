@@ -8,13 +8,30 @@ class SongFiles():
         nom_dossier = "musiques"
         self.dossier_musiques = os.path.join(os.path.dirname(__file__), nom_dossier)
     
-    def ajouterMusique(self, song: Song):
+    def get_new_id(self) -> int:
+        """
+        Renvoie un id unique pour une musique
+        """
+        fichiers = os.listdir(self.dossier_musiques)
+        return len(fichiers) + 1
+    
+    def ajouterMusique(self, song: Song, data: bytearray):
         """
         Ajoute une musique dans le dossier musiques
         """
         # création du fichier
         with open(f"{self.dossier_musiques}/{song.id}-{song.titre}-{song.auteur}.{song.extension}", "wb") as f:
-            f.write(song.donnees)
+            f.write(data)
+    
+    def ajouterMusique(self, title : str, author : str, extension : str, data: bytearray):
+        """
+        Ajoute une musique dans le dossier musiques
+        """
+        # création du fichier
+        
+        id = self.get_new_id()
+        song = Song(id, title, author, extension)
+        self.ajouterMusique(song, data)
             
     def supprimerMusique(self, song: Song):
         """
@@ -27,12 +44,12 @@ class SongFiles():
                 os.remove(os.path.join(self.dossier_musiques, fichier))
                 return
     
-    def modifierMusique(self, song: Song):
+    def modifierMusique(self, song: Song, data: bytearray):
         """
         Modifie une musique du dossier musiques
         """
         self.supprimerMusique(song.id)
-        self.ajouterMusique(song)
+        self.ajouterMusique(song, data)
 
     def getAlldossier_musiques(self) -> dict[int, Song]:
         """
@@ -47,14 +64,7 @@ class SongFiles():
         for fichier in fichiers:
             id, titre, auteur_and_ext = fichier.split("-")
             auteur, extension = auteur_and_ext.split(".")
-            
-            # lecture des données binaires du fichier
-            donnees = None
-            with open(f"{self.dossier_musiques}/{fichier}", "rb") as f:
-                donnees = f.read()
-            #donnees est de type bytes
-            
-            dict[titre] = Song(int(id), titre, auteur, extension, donnees)
+            dict[titre] = Song(int(id), titre, auteur, extension)
             
         return dict         
     
@@ -63,25 +73,32 @@ class MusicLibraryI(Soup.MusicLibrary):
     def __init__(self):
         self.songfiles = SongFiles()
         
-    def addSong(self, song : Song, current=None):
-        self.songfiles.ajouterMusique(song)
+    def addSong(self, title : str, author : str, extension : str, data: bytearray, current=None):
+        print("Ajout de la musique")
+        self.songfiles.ajouterMusique(title, author, extension, data)
         
     def removeSong(self, song : Song, current=None):
+        print("Suppression de la musique")
         self.songfiles.supprimerMusique(song)
 
-    def updateSong(self, song : Soup, current=None):
-        self.songfiles.modifierMusique(song)
+    def updateSong(self, song : Soup, data: bytearray, current=None):
+        print("Modification de la musique")
+        self.songfiles.modifierMusique(song, data)
 
     def searchByTitle(self, title, current=None)->list[Song]:
+        print("Recherche par titre")
         songs = self.songfiles.getAlldossier_musiques()
+        print(songs)
         return [song for song in songs.values() if song.title == title]
 
     def searchByAuthor(self, author, current=None)->list[Song]:
+        print("Recherche par auteur")
         songs = self.songfiles.getAlldossier_musiques()
+        print(songs)
         return [song for song in songs.values() if song.author == author]
 
 with Ice.initialize() as communicator:
-    adapter = communicator.createObjectAdapterWithEndpoints("MusicLibraryAdapter", "default -p 10000") # Création de l'adaptateur qui sert à communiquer avec le client
+    adapter = communicator.createObjectAdapterWithEndpoints("MusicLibraryAdapter", "ws -p 10000") # Création de l'adaptateur qui sert à communiquer avec le client
     object = MusicLibraryI() # Création de l'objet servant
     adapter.add(object, communicator.stringToIdentity("MusicLibrary")) # Ajout de l'objet servant à l'adaptateur
     adapter.activate() # Activation de l'adaptateur
