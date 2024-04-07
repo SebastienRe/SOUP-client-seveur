@@ -237,7 +237,7 @@ if 'MusicLibraryPrx' not in _M_Soup.__dict__:
     _M_Soup._t_MusicLibraryDisp = IcePy.defineClass('::Soup::MusicLibrary', MusicLibrary, (), None, ())
     MusicLibrary._ice_type = _M_Soup._t_MusicLibraryDisp
 
-    MusicLibrary._op_addSong = IcePy.Operation('addSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), IcePy._t_string, False, 0), ((), IcePy._t_string, False, 0), ((), IcePy._t_string, False, 0)), (), ((), IcePy._t_int, False, 0), ())
+    MusicLibrary._op_addSong = IcePy.Operation('addSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), IcePy._t_string, False, 0), ((), IcePy._t_string, False, 0), ((), IcePy._t_string, False, 0)), (), ((), _M_Soup._t_Song, False, 0), ())
     MusicLibrary._op_addSongData = IcePy.Operation('addSongData', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), _M_Soup._t_Song, False, 0), ((), _M_Soup._t_songdatas, False, 0), ((), IcePy._t_bool, False, 0)), (), None, ())
     MusicLibrary._op_updateSong = IcePy.Operation('updateSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), _M_Soup._t_Song, False, 0), ((), IcePy._t_bool, False, 0)), (), None, ())
     MusicLibrary._op_removeSong = IcePy.Operation('removeSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), _M_Soup._t_Song, False, 0),), (), None, ())

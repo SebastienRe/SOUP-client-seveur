@@ -32,14 +32,13 @@ class SongFiles():
         fichiers = os.listdir(self.dossier_musiques)
         return len(fichiers) + 1
     
-    def ajouterMusique(self, song: Song):
+    def ajouterMusiqueS(self, song: Song):
         """
         Ajoute une musique dans le dossier musiques
         """
-        data = []
         # création du fichier
-        with open(f"{self.dossier_musiques}/{song.id}-{song.titre}-{song.auteur}.{song.extension}", "wb") as f:
-            f.write(data)
+        with open(f"{self.dossier_musiques}/{song.id}-{song.title}-{song.author}.{song.extension}", "wb") as f:
+            f.write(bytearray())
     
     def ajouterMusique(self, title : str, author : str, extension : str):
         """
@@ -49,8 +48,8 @@ class SongFiles():
         
         id = self.get_new_id()
         song = Song(id, title, author, extension, 0)
-        self.ajouterMusique(song)
-        return id
+        self.ajouterMusiqueS(song)
+        return song
     
     def editionDonneesMusique(self, id : int, data: bytearray):
         """
@@ -123,6 +122,7 @@ class MusicLibraryI(Soup.MusicLibrary):
         
     def addSong(self, title : str, author : str, extension : str, current=None):
         print("Ajout de la musique")
+        print(title, author, extension)
         return self.songfiles.ajouterMusique(title, author, extension)
 
     def addSongData(self, song : Song, data: bytearray, finish : bool): #// adds the song data to the song
@@ -204,4 +204,4 @@ with Ice.initialize() as communicator:
     communicator.waitForShutdown() # Attente de la fin du programme
     
 #\cmd>python serveur.py 10000 rock
-#\cmd>python serveur.py 10001 pop
+#\cmd>python serveur.py 10001 epic

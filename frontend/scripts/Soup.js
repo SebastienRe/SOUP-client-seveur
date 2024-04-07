@@ -80,7 +80,7 @@
 
     Slice.defineOperations(Soup.MusicLibrary, Soup.MusicLibraryPrx, iceC_Soup_MusicLibrary_ids, 1,
     {
-        "addSong": [, , , , [3], [[7], [7], [7]], , , , ],
+        "addSong": [, , , , [Soup.Song], [[7], [7], [7]], , , , ],
         "addSongData": [, , , , , [[Soup.Song], ["Soup.songdatasHelper"], [1]], , , , ],
         "updateSong": [, , , , , [[Soup.Song], [1]], , , , ],
         "removeSong": [, , , , , [[Soup.Song]], , , , ],

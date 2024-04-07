@@ -14,7 +14,7 @@ module Soup
 
     interface MusicLibrary
     {
-        int addSong(string title, string author, string extension); // returns the id of the song
+        Song addSong(string title, string author, string extension); // returns the id of the song
         void addSongData(Song song, songdatas data, bool finish); // returns the id of the song
         void updateSong(Song song, bool reset);
         void removeSong(Song song);
