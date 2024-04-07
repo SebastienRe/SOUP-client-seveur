@@ -28,12 +28,13 @@
 
     Soup.Song = class
     {
-        constructor(id = 0, title = "", author = "", extension = "")
+        constructor(id = 0, title = "", author = "", extension = "", accuracy = 0.0)
         {
             this.id = id;
             this.title = title;
             this.author = author;
             this.extension = extension;
+            this.accuracy = accuracy;
         }
 
         _write(ostr)
@@ -42,6 +43,7 @@
             ostr.writeString(this.title);
             ostr.writeString(this.author);
             ostr.writeString(this.extension);
+            ostr.writeFloat(this.accuracy);
         }
 
         _read(istr)
@@ -50,15 +52,16 @@
             this.title = istr.readString();
             this.author = istr.readString();
             this.extension = istr.readString();
+            this.accuracy = istr.readFloat();
         }
 
         static get minWireSize()
         {
-            return  7;
+            return  11;
         }
     };
 
-    Slice.defineStruct(Soup.Song, true, true);
+    Slice.defineStruct(Soup.Song, false, true);
 
     Slice.defineSequence(Soup, "SongsHelper", "Soup.Song", false);
 
@@ -80,8 +83,10 @@
         "addSong": [, , , , , [[7], [7], [7], ["Soup.songdatasHelper"]], , , , ],
         "removeSong": [, , , , , [[Soup.Song]], , , , ],
         "updateSong": [, , , , , [[Soup.Song], ["Soup.songdatasHelper"]], , , , ],
-        "searchByTitle": [, , , , ["Soup.SongsHelper"], [[7]], , , , ],
-        "searchByAuthor": [, , , , ["Soup.SongsHelper"], [[7]], , , , ]
+        "searchWithText": [, , , , ["Soup.SongsHelper"], [[7]], , , , ],
+        "playSong": [, , , , [3], [[Soup.Song]], , , , ],
+        "stopSong": [, , , , , [[3]], , , , ],
+        "playPauseSong": [, , , , , [[3]], , , , ]
     });
     exports.Soup = Soup;
 }

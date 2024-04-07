@@ -27,101 +27,33 @@ if '_t_songdatas' not in _M_Soup.__dict__:
 if 'Song' not in _M_Soup.__dict__:
     _M_Soup.Song = Ice.createTempClass()
     class Song(object):
-        def __init__(self, id=0, title='', author='', extension=''):
+        def __init__(self, id=0, title='', author='', extension='', accuracy=0.0):
             self.id = id
             self.title = title
             self.author = author
             self.extension = extension
+            self.accuracy = accuracy
 
-        def __hash__(self):
-            _h = 0
-            _h = 5 * _h + Ice.getHash(self.id)
-            _h = 5 * _h + Ice.getHash(self.title)
-            _h = 5 * _h + Ice.getHash(self.author)
-            _h = 5 * _h + Ice.getHash(self.extension)
-            return _h % 0x7fffffff
-
-        def __compare(self, other):
+        def __eq__(self, other):
             if other is None:
-                return 1
+                return False
             elif not isinstance(other, _M_Soup.Song):
                 return NotImplemented
             else:
-                if self.id is None or other.id is None:
-                    if self.id != other.id:
-                        return (-1 if self.id is None else 1)
-                else:
-                    if self.id < other.id:
-                        return -1
-                    elif self.id > other.id:
-                        return 1
-                if self.title is None or other.title is None:
-                    if self.title != other.title:
-                        return (-1 if self.title is None else 1)
-                else:
-                    if self.title < other.title:
-                        return -1
-                    elif self.title > other.title:
-                        return 1
-                if self.author is None or other.author is None:
-                    if self.author != other.author:
-                        return (-1 if self.author is None else 1)
-                else:
-                    if self.author < other.author:
-                        return -1
-                    elif self.author > other.author:
-                        return 1
-                if self.extension is None or other.extension is None:
-                    if self.extension != other.extension:
-                        return (-1 if self.extension is None else 1)
-                else:
-                    if self.extension < other.extension:
-                        return -1
-                    elif self.extension > other.extension:
-                        return 1
-                return 0
-
-        def __lt__(self, other):
-            r = self.__compare(other)
-            if r is NotImplemented:
-                return r
-            else:
-                return r < 0
-
-        def __le__(self, other):
-            r = self.__compare(other)
-            if r is NotImplemented:
-                return r
-            else:
-                return r <= 0
-
-        def __gt__(self, other):
-            r = self.__compare(other)
-            if r is NotImplemented:
-                return r
-            else:
-                return r > 0
-
-        def __ge__(self, other):
-            r = self.__compare(other)
-            if r is NotImplemented:
-                return r
-            else:
-                return r >= 0
-
-        def __eq__(self, other):
-            r = self.__compare(other)
-            if r is NotImplemented:
-                return r
-            else:
-                return r == 0
+                if self.id != other.id:
+                    return False
+                if self.title != other.title:
+                    return False
+                if self.author != other.author:
+                    return False
+                if self.extension != other.extension:
+                    return False
+                if self.accuracy != other.accuracy:
+                    return False
+                return True
 
         def __ne__(self, other):
-            r = self.__compare(other)
-            if r is NotImplemented:
-                return r
-            else:
-                return r != 0
+            return not self.__eq__(other)
 
         def __str__(self):
             return IcePy.stringify(self, _M_Soup._t_Song)
@@ -132,7 +64,8 @@ if 'Song' not in _M_Soup.__dict__:
         ('id', (), IcePy._t_int),
         ('title', (), IcePy._t_string),
         ('author', (), IcePy._t_string),
-        ('extension', (), IcePy._t_string)
+        ('extension', (), IcePy._t_string),
+        ('accuracy', (), IcePy._t_float)
     ))
 
     _M_Soup.Song = Song
@@ -183,29 +116,53 @@ if 'MusicLibraryPrx' not in _M_Soup.__dict__:
         def end_updateSong(self, _r):
             return _M_Soup.MusicLibrary._op_updateSong.end(self, _r)
 
-        def searchByTitle(self, title, context=None):
-            return _M_Soup.MusicLibrary._op_searchByTitle.invoke(self, ((title, ), context))
+        def searchWithText(self, text, context=None):
+            return _M_Soup.MusicLibrary._op_searchWithText.invoke(self, ((text, ), context))
 
-        def searchByTitleAsync(self, title, context=None):
-            return _M_Soup.MusicLibrary._op_searchByTitle.invokeAsync(self, ((title, ), context))
+        def searchWithTextAsync(self, text, context=None):
+            return _M_Soup.MusicLibrary._op_searchWithText.invokeAsync(self, ((text, ), context))
 
-        def begin_searchByTitle(self, title, _response=None, _ex=None, _sent=None, context=None):
-            return _M_Soup.MusicLibrary._op_searchByTitle.begin(self, ((title, ), _response, _ex, _sent, context))
+        def begin_searchWithText(self, text, _response=None, _ex=None, _sent=None, context=None):
+            return _M_Soup.MusicLibrary._op_searchWithText.begin(self, ((text, ), _response, _ex, _sent, context))
 
-        def end_searchByTitle(self, _r):
-            return _M_Soup.MusicLibrary._op_searchByTitle.end(self, _r)
+        def end_searchWithText(self, _r):
+            return _M_Soup.MusicLibrary._op_searchWithText.end(self, _r)
 
-        def searchByAuthor(self, author, context=None):
-            return _M_Soup.MusicLibrary._op_searchByAuthor.invoke(self, ((author, ), context))
+        def playSong(self, song, context=None):
+            return _M_Soup.MusicLibrary._op_playSong.invoke(self, ((song, ), context))
 
-        def searchByAuthorAsync(self, author, context=None):
-            return _M_Soup.MusicLibrary._op_searchByAuthor.invokeAsync(self, ((author, ), context))
+        def playSongAsync(self, song, context=None):
+            return _M_Soup.MusicLibrary._op_playSong.invokeAsync(self, ((song, ), context))
 
-        def begin_searchByAuthor(self, author, _response=None, _ex=None, _sent=None, context=None):
-            return _M_Soup.MusicLibrary._op_searchByAuthor.begin(self, ((author, ), _response, _ex, _sent, context))
+        def begin_playSong(self, song, _response=None, _ex=None, _sent=None, context=None):
+            return _M_Soup.MusicLibrary._op_playSong.begin(self, ((song, ), _response, _ex, _sent, context))
 
-        def end_searchByAuthor(self, _r):
-            return _M_Soup.MusicLibrary._op_searchByAuthor.end(self, _r)
+        def end_playSong(self, _r):
+            return _M_Soup.MusicLibrary._op_playSong.end(self, _r)
+
+        def stopSong(self, port, context=None):
+            return _M_Soup.MusicLibrary._op_stopSong.invoke(self, ((port, ), context))
+
+        def stopSongAsync(self, port, context=None):
+            return _M_Soup.MusicLibrary._op_stopSong.invokeAsync(self, ((port, ), context))
+
+        def begin_stopSong(self, port, _response=None, _ex=None, _sent=None, context=None):
+            return _M_Soup.MusicLibrary._op_stopSong.begin(self, ((port, ), _response, _ex, _sent, context))
+
+        def end_stopSong(self, _r):
+            return _M_Soup.MusicLibrary._op_stopSong.end(self, _r)
+
+        def playPauseSong(self, port, context=None):
+            return _M_Soup.MusicLibrary._op_playPauseSong.invoke(self, ((port, ), context))
+
+        def playPauseSongAsync(self, port, context=None):
+            return _M_Soup.MusicLibrary._op_playPauseSong.invokeAsync(self, ((port, ), context))
+
+        def begin_playPauseSong(self, port, _response=None, _ex=None, _sent=None, context=None):
+            return _M_Soup.MusicLibrary._op_playPauseSong.begin(self, ((port, ), _response, _ex, _sent, context))
+
+        def end_playPauseSong(self, _r):
+            return _M_Soup.MusicLibrary._op_playPauseSong.end(self, _r)
 
         @staticmethod
         def checkedCast(proxy, facetOrContext=None, context=None):
@@ -245,11 +202,17 @@ if 'MusicLibraryPrx' not in _M_Soup.__dict__:
         def updateSong(self, song, data, current=None):
             raise NotImplementedError("servant method 'updateSong' not implemented")
 
-        def searchByTitle(self, title, current=None):
-            raise NotImplementedError("servant method 'searchByTitle' not implemented")
+        def searchWithText(self, text, current=None):
+            raise NotImplementedError("servant method 'searchWithText' not implemented")
 
-        def searchByAuthor(self, author, current=None):
-            raise NotImplementedError("servant method 'searchByAuthor' not implemented")
+        def playSong(self, song, current=None):
+            raise NotImplementedError("servant method 'playSong' not implemented")
+
+        def stopSong(self, port, current=None):
+            raise NotImplementedError("servant method 'stopSong' not implemented")
+
+        def playPauseSong(self, port, current=None):
+            raise NotImplementedError("servant method 'playPauseSong' not implemented")
 
         def __str__(self):
             return IcePy.stringify(self, _M_Soup._t_MusicLibraryDisp)
@@ -262,8 +225,10 @@ if 'MusicLibraryPrx' not in _M_Soup.__dict__:
     MusicLibrary._op_addSong = IcePy.Operation('addSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), IcePy._t_string, False, 0), ((), IcePy._t_string, False, 0), ((), IcePy._t_string, False, 0), ((), _M_Soup._t_songdatas, False, 0)), (), None, ())
     MusicLibrary._op_removeSong = IcePy.Operation('removeSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), _M_Soup._t_Song, False, 0),), (), None, ())
     MusicLibrary._op_updateSong = IcePy.Operation('updateSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), _M_Soup._t_Song, False, 0), ((), _M_Soup._t_songdatas, False, 0)), (), None, ())
-    MusicLibrary._op_searchByTitle = IcePy.Operation('searchByTitle', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), IcePy._t_string, False, 0),), (), ((), _M_Soup._t_Songs, False, 0), ())
-    MusicLibrary._op_searchByAuthor = IcePy.Operation('searchByAuthor', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), IcePy._t_string, False, 0),), (), ((), _M_Soup._t_Songs, False, 0), ())
+    MusicLibrary._op_searchWithText = IcePy.Operation('searchWithText', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), IcePy._t_string, False, 0),), (), ((), _M_Soup._t_Songs, False, 0), ())
+    MusicLibrary._op_playSong = IcePy.Operation('playSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), _M_Soup._t_Song, False, 0),), (), ((), IcePy._t_int, False, 0), ())
+    MusicLibrary._op_stopSong = IcePy.Operation('stopSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), IcePy._t_int, False, 0),), (), None, ())
+    MusicLibrary._op_playPauseSong = IcePy.Operation('playPauseSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), IcePy._t_int, False, 0),), (), None, ())
 
     _M_Soup.MusicLibrary = MusicLibrary
     del MusicLibrary

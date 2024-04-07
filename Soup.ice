@@ -7,6 +7,7 @@ module Soup
         string title;
         string author;
         string extension;
+        float accuracy;
     }
 
     sequence<Song> Songs;
@@ -16,7 +17,10 @@ module Soup
         void addSong(string title, string author, string extension, songdatas data);
         void removeSong(Song song);
         void updateSong(Song song, songdatas data);
-        Songs searchByTitle(string title);
-        Songs searchByAuthor(string author);
+        Songs searchWithText(string text);
+
+        int playSong(Song song); //returns the port number
+        void stopSong(int port); //stops the song playing on the port
+        void playPauseSong(int port); //pauses or play the song playing on the port 
     }
 }
