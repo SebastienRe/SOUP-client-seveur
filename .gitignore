@@ -5,4 +5,5 @@ serveur/Soup
 client/Soup.js
 serveur/__pycache__
 front
+client
 **/*.pyc
