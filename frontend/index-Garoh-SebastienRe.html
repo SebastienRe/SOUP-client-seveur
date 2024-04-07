@@ -18,23 +18,38 @@
     <script src="./scripts/Soup.js"></script> <!-- Ajout de Soup.ice (l'interface) -->
     <script src="./scripts/utils.js"></script>
     <script type="text/javascript"> // initialisation de la connexion Ice
-        let player = null;
-        try {
+        const serveurs = [
+            { name: "rock", host: "localhost", port: 10000, protocol: "ws"},
+            { name: "epic", host: "localhost", port: 10001, protocol: "ws"}  
+        ]
+
+        let communicator = null;
+        let players = [];
+        async function init() {
+            disable_error();
             const communicator = Ice.initialize();
-            const proxy = communicator.stringToProxy("MusicLibrary:ws -h localhost -p 10000 -h " + window.location.hostname );
-            player = Soup.MusicLibraryPrx.checkedCast(proxy)
-        } catch (e) {
-            error("Impossible de se connecter au serveur Ice : " + e);
-            setTimeout(() => {
-                window.location.reload();
-            }, 3000);
-        } finally {
-            if (player === null) {
-                error("Impossible de se connecter au serveur Ice");
-            } else {
-                info("Connecté au serveur Ice");
+            if (communicator === null) {
+                error("Impossible d'initialiser Ice");
+                return;
+            }
+            players = [];
+            for (const serveur of serveurs) {
+                try {
+                    const proxy = communicator.stringToProxy("MusicLibrary:" + serveur.protocol + " -h " + serveur.host + " -p " + serveur.port);
+                    const player = await Soup.MusicLibraryPrx.checkedCast(proxy);
+                    players.push(player);
+                } catch (e) {
+                    error("Impossible de se connecter au serveur " + serveur.name + " : " + e);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3000);
+                }
             }
         }
+        
+        init();
+
+        
     </script>
     <script src="./scripts/Controller.js"></script>
 
@@ -71,6 +86,10 @@
                                 <input id="inputMp3" type="file" placeholder="Fichier mp3" accept="audio/mp3" multiple="false"  />
                                 <input id="inputTitre" type="text" placeholder="Titre" />
                                 <input id="inputAuteur" type="text" placeholder="Artiste" />
+                                <select id="inputType">
+                                    <option value="rock">Rock</option>
+                                    <option value="epic">Epic</option>
+                                </select>
                                 <button type="button" onclick="envoyerMp3()">Envoyer</button>
                             </div>
                         </td>

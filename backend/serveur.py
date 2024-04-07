@@ -1,12 +1,10 @@
 import socket
 import Ice
-import backend.Soup as Soup
-from backend.Soup import Song
+import Soup as Soup
+from Soup import Song
 import os
 import argparse
-import time
 import vlc
-from vlc import MediaPlayer
 
 # Créer un parseur d'arguments
 parser = argparse.ArgumentParser(description="Lance le serveur avec un numéro de port spécifique et un sous-dossier spécifique dans 'dossier_musiques'.")
@@ -25,6 +23,7 @@ sous_dossier = args.sous_dossier
 class SongFiles():
     def __init__(self):
         self.dossier_musiques = os.path.join(os.path.dirname(__file__), "musiques", sous_dossier)
+        self.file_data = {}
     
     def get_new_id(self) -> int:
         """
@@ -33,15 +32,16 @@ class SongFiles():
         fichiers = os.listdir(self.dossier_musiques)
         return len(fichiers) + 1
     
-    def ajouterMusique(self, song: Song, data: bytearray):
+    def ajouterMusique(self, song: Song):
         """
         Ajoute une musique dans le dossier musiques
         """
+        data = []
         # création du fichier
         with open(f"{self.dossier_musiques}/{song.id}-{song.titre}-{song.auteur}.{song.extension}", "wb") as f:
             f.write(data)
     
-    def ajouterMusique(self, title : str, author : str, extension : str, data: bytearray):
+    def ajouterMusique(self, title : str, author : str, extension : str):
         """
         Ajoute une musique dans le dossier musiques
         """
@@ -49,7 +49,29 @@ class SongFiles():
         
         id = self.get_new_id()
         song = Song(id, title, author, extension, 0)
-        self.ajouterMusique(song, data)
+        self.ajouterMusique(song)
+        return id
+    
+    def editionDonneesMusique(self, id : int, data: bytearray):
+        """
+        Modifie les données d'une musique
+        """
+        with open(f"{self.dossier_musiques}/{id}.mp3", "wb") as f:
+            f.write(data)
+    
+    def addDonneesMusique(self, id : int, data: bytearray, finish: bool, resetMusic: bool):
+        """
+        Ajoute des données à une musique
+        """
+        if resetMusic:
+            self.file_data[id] = bytearray()
+        else :
+            self.file_data[id] += data
+            
+        if finish:
+            self.editionDonneesMusique(id, self.file_data[id])
+            del self.file_data[id]
+        
             
     def supprimerMusique(self, song: Song):
         """
@@ -62,14 +84,21 @@ class SongFiles():
                 os.remove(os.path.join(self.dossier_musiques, fichier))
                 return
     
-    def modifierMusique(self, song: Song, data: bytearray):
+    def modifierMusique(self, song: Song, reset: bool):
         """
         Modifie une musique du dossier musiques
         """
-        self.supprimerMusique(song.id)
-        self.ajouterMusique(song, data)
+        fichiers = os.listdir(self.dossier_musiques)
+        for fichier in fichiers:
+            id_fichier, titre, auteur_and_ext = fichier.split("-")
+            if int(id_fichier) == song.id:
+                os.rename(os.path.join(self.dossier_musiques, fichier), os.path.join(self.dossier_musiques, f"{song.id}-{song.titre}-{song.auteur}.{song.extension}"))
+                break
+            
+        if reset:
+            self.editionDonneesMusique(song.id, bytearray())
 
-    def getAlldossier_musiques(self) -> dict[int, Song]:
+    def getAlldossier_musiques(self) -> list[int, Song]:
         """
         Renvoie la liste des musiques sous forme de dictionnaire
         {titre: Song}
@@ -78,13 +107,13 @@ class SongFiles():
         
         #recuperation des musiques dans le dossier musiques et transformation en objet Song que j'ai défini dans mon ice
         # le nom du fichier ressebmle à "titre-auteur.extension"
-        dict = {}
+        list = []
         for fichier in fichiers:
             id, titre, auteur_and_ext = fichier.split("-")
             auteur, extension = auteur_and_ext.split(".")
-            dict[titre] = Song(int(id), titre, auteur, extension, 0)
+            list.append(Song(int(id), titre, auteur, extension, 0))
             
-        return dict         
+        return list       
     
 
 class MusicLibraryI(Soup.MusicLibrary):
@@ -92,22 +121,26 @@ class MusicLibraryI(Soup.MusicLibrary):
         self.songfiles = SongFiles()
         self.ports_stream = []
         
-    def addSong(self, title : str, author : str, extension : str, data: bytearray, current=None):
+    def addSong(self, title : str, author : str, extension : str, current=None):
         print("Ajout de la musique")
-        self.songfiles.ajouterMusique(title, author, extension, data)
+        return self.songfiles.ajouterMusique(title, author, extension)
+
+    def addSongData(self, song : Song, data: bytearray, finish : bool): #// adds the song data to the song
+        print("Ajout des données de la musique")
+        self.songfiles.addDonneesMusique(song.id, data, finish, False)
+
+    def updateSong(self, song : Soup, resetMusic:bool, reset:bool, current=None):
+        print("Modification de la musique")
+        self.songfiles.modifierMusique(song, resetMusic, reset)
         
     def removeSong(self, song : Song, current=None):
         print("Suppression de la musique")
         self.songfiles.supprimerMusique(song)
-
-    def updateSong(self, song : Soup, data: bytearray, current=None):
-        print("Modification de la musique")
-        self.songfiles.modifierMusique(song, data)
     
     def searchWithText(self, text, current=None) -> list[Song]:
         print("Recherche par texte")
         songs = self.songfiles.getAlldossier_musiques()
-        for song in songs.values():
+        for song in songs:
             title_match = text in song.title
             author_match = text in song.author
             if title_match or author_match:
@@ -115,6 +148,7 @@ class MusicLibraryI(Soup.MusicLibrary):
                 title_precision = len(text) / len(song.title)
                 author_precision = len(text) / len(song.author)
                 song.accuracy = max(title_precision, author_precision)
+        print(songs)
         return songs
 
     def playSong(self, song : Song, current=None):
@@ -149,6 +183,8 @@ class MusicLibraryI(Soup.MusicLibrary):
         print("Arret de la musique")
         if self.ports_stream[port]: # Si le port existe
             self.ports_stream[port].stop() # Arreter la musique
+            self.ports_stream[port].release() # Libérer le port
+            del self.ports_stream[port] # Supprimer le port
         return
     
     def playPauseSong(self, port, current=None):

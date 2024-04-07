@@ -80,17 +80,41 @@ if 'MusicLibraryPrx' not in _M_Soup.__dict__:
     _M_Soup.MusicLibraryPrx = Ice.createTempClass()
     class MusicLibraryPrx(Ice.ObjectPrx):
 
-        def addSong(self, title, author, extension, data, context=None):
-            return _M_Soup.MusicLibrary._op_addSong.invoke(self, ((title, author, extension, data), context))
+        def addSong(self, title, author, extension, context=None):
+            return _M_Soup.MusicLibrary._op_addSong.invoke(self, ((title, author, extension), context))
 
-        def addSongAsync(self, title, author, extension, data, context=None):
-            return _M_Soup.MusicLibrary._op_addSong.invokeAsync(self, ((title, author, extension, data), context))
+        def addSongAsync(self, title, author, extension, context=None):
+            return _M_Soup.MusicLibrary._op_addSong.invokeAsync(self, ((title, author, extension), context))
 
-        def begin_addSong(self, title, author, extension, data, _response=None, _ex=None, _sent=None, context=None):
-            return _M_Soup.MusicLibrary._op_addSong.begin(self, ((title, author, extension, data), _response, _ex, _sent, context))
+        def begin_addSong(self, title, author, extension, _response=None, _ex=None, _sent=None, context=None):
+            return _M_Soup.MusicLibrary._op_addSong.begin(self, ((title, author, extension), _response, _ex, _sent, context))
 
         def end_addSong(self, _r):
             return _M_Soup.MusicLibrary._op_addSong.end(self, _r)
+
+        def addSongData(self, song, data, finish, context=None):
+            return _M_Soup.MusicLibrary._op_addSongData.invoke(self, ((song, data, finish), context))
+
+        def addSongDataAsync(self, song, data, finish, context=None):
+            return _M_Soup.MusicLibrary._op_addSongData.invokeAsync(self, ((song, data, finish), context))
+
+        def begin_addSongData(self, song, data, finish, _response=None, _ex=None, _sent=None, context=None):
+            return _M_Soup.MusicLibrary._op_addSongData.begin(self, ((song, data, finish), _response, _ex, _sent, context))
+
+        def end_addSongData(self, _r):
+            return _M_Soup.MusicLibrary._op_addSongData.end(self, _r)
+
+        def updateSong(self, song, reset, context=None):
+            return _M_Soup.MusicLibrary._op_updateSong.invoke(self, ((song, reset), context))
+
+        def updateSongAsync(self, song, reset, context=None):
+            return _M_Soup.MusicLibrary._op_updateSong.invokeAsync(self, ((song, reset), context))
+
+        def begin_updateSong(self, song, reset, _response=None, _ex=None, _sent=None, context=None):
+            return _M_Soup.MusicLibrary._op_updateSong.begin(self, ((song, reset), _response, _ex, _sent, context))
+
+        def end_updateSong(self, _r):
+            return _M_Soup.MusicLibrary._op_updateSong.end(self, _r)
 
         def removeSong(self, song, context=None):
             return _M_Soup.MusicLibrary._op_removeSong.invoke(self, ((song, ), context))
@@ -103,18 +127,6 @@ if 'MusicLibraryPrx' not in _M_Soup.__dict__:
 
         def end_removeSong(self, _r):
             return _M_Soup.MusicLibrary._op_removeSong.end(self, _r)
-
-        def updateSong(self, song, data, context=None):
-            return _M_Soup.MusicLibrary._op_updateSong.invoke(self, ((song, data), context))
-
-        def updateSongAsync(self, song, data, context=None):
-            return _M_Soup.MusicLibrary._op_updateSong.invokeAsync(self, ((song, data), context))
-
-        def begin_updateSong(self, song, data, _response=None, _ex=None, _sent=None, context=None):
-            return _M_Soup.MusicLibrary._op_updateSong.begin(self, ((song, data), _response, _ex, _sent, context))
-
-        def end_updateSong(self, _r):
-            return _M_Soup.MusicLibrary._op_updateSong.end(self, _r)
 
         def searchWithText(self, text, context=None):
             return _M_Soup.MusicLibrary._op_searchWithText.invoke(self, ((text, ), context))
@@ -193,14 +205,17 @@ if 'MusicLibraryPrx' not in _M_Soup.__dict__:
         def ice_staticId():
             return '::Soup::MusicLibrary'
 
-        def addSong(self, title, author, extension, data, current=None):
+        def addSong(self, title, author, extension, current=None):
             raise NotImplementedError("servant method 'addSong' not implemented")
+
+        def addSongData(self, song, data, finish, current=None):
+            raise NotImplementedError("servant method 'addSongData' not implemented")
+
+        def updateSong(self, song, reset, current=None):
+            raise NotImplementedError("servant method 'updateSong' not implemented")
 
         def removeSong(self, song, current=None):
             raise NotImplementedError("servant method 'removeSong' not implemented")
-
-        def updateSong(self, song, data, current=None):
-            raise NotImplementedError("servant method 'updateSong' not implemented")
 
         def searchWithText(self, text, current=None):
             raise NotImplementedError("servant method 'searchWithText' not implemented")
@@ -222,9 +237,10 @@ if 'MusicLibraryPrx' not in _M_Soup.__dict__:
     _M_Soup._t_MusicLibraryDisp = IcePy.defineClass('::Soup::MusicLibrary', MusicLibrary, (), None, ())
     MusicLibrary._ice_type = _M_Soup._t_MusicLibraryDisp
 
-    MusicLibrary._op_addSong = IcePy.Operation('addSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), IcePy._t_string, False, 0), ((), IcePy._t_string, False, 0), ((), IcePy._t_string, False, 0), ((), _M_Soup._t_songdatas, False, 0)), (), None, ())
+    MusicLibrary._op_addSong = IcePy.Operation('addSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), IcePy._t_string, False, 0), ((), IcePy._t_string, False, 0), ((), IcePy._t_string, False, 0)), (), ((), IcePy._t_int, False, 0), ())
+    MusicLibrary._op_addSongData = IcePy.Operation('addSongData', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), _M_Soup._t_Song, False, 0), ((), _M_Soup._t_songdatas, False, 0), ((), IcePy._t_bool, False, 0)), (), None, ())
+    MusicLibrary._op_updateSong = IcePy.Operation('updateSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), _M_Soup._t_Song, False, 0), ((), IcePy._t_bool, False, 0)), (), None, ())
     MusicLibrary._op_removeSong = IcePy.Operation('removeSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), _M_Soup._t_Song, False, 0),), (), None, ())
-    MusicLibrary._op_updateSong = IcePy.Operation('updateSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), _M_Soup._t_Song, False, 0), ((), _M_Soup._t_songdatas, False, 0)), (), None, ())
     MusicLibrary._op_searchWithText = IcePy.Operation('searchWithText', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), IcePy._t_string, False, 0),), (), ((), _M_Soup._t_Songs, False, 0), ())
     MusicLibrary._op_playSong = IcePy.Operation('playSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), _M_Soup._t_Song, False, 0),), (), ((), IcePy._t_int, False, 0), ())
     MusicLibrary._op_stopSong = IcePy.Operation('stopSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), IcePy._t_int, False, 0),), (), None, ())

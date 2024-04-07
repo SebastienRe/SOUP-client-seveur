@@ -1,6 +1,14 @@
+let errors = [];
+
 function error(e, ...str) {
-  console.error(e);
-  $("#notifContent").html("<h1>Error</h1><p>" + e + "</p><p>" + str + "</p>");
+  errors.push({ error: e, str: str });
+  html = "<h1>Error</h1>";
+  for (let i = 0; i < errors.length; i++) {
+    console.error(errors[i].error);
+    html +=
+      "<div><p>" + errors[i].error + "</p><p>" + errors[i].str + "</p></div>";
+  }
+  $("#notifContent").html(html);
   $("#notif").removeClass("w3-hide");
 }
 
@@ -12,6 +20,7 @@ function info(str) {
 
 function disable_error() {
   $("#notif").addClass("w3-hide");
+  errors = [];
 }
 
 function afficherInfos() {
