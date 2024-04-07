@@ -39,8 +39,19 @@ function envoyerMp3(event) {
 
     try {
       players[index].addSong(titre, auteur, extension).then((response) => {
-        event.preventDefault();
         console.log("response", response);
+        console.log("data", data);
+        //j'aimerai decouper mes données en paques de 4096 octets
+        const chunkSize = 4096;
+        const chunks = [];
+        for (let i = 0; i < data.length; i += chunkSize) {
+          chunks.push(data.slice(i, i + chunkSize));
+        }
+        //attendre 3 secondes
+        setTimeout(() => {
+          console.log("chunks", chunks);
+        }, 3000);
+        //players[index].addSongData(response, chunks).then((response) => {
       });
     } catch (error) {
       console.error("Error calling addSong:", error);
