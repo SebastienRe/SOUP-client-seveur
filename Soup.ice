@@ -23,6 +23,5 @@ module Soup
 
         int playSong(Song song); //returns the port number
         void stopSong(int port); //stops the song playing on the port
-        void playPauseSong(int port); //pauses or play the song playing on the port 
     }
 }

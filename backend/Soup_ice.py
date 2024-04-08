@@ -168,18 +168,6 @@ if 'MusicLibraryPrx' not in _M_Soup.__dict__:
         def end_stopSong(self, _r):
             return _M_Soup.MusicLibrary._op_stopSong.end(self, _r)
 
-        def playPauseSong(self, port, context=None):
-            return _M_Soup.MusicLibrary._op_playPauseSong.invoke(self, ((port, ), context))
-
-        def playPauseSongAsync(self, port, context=None):
-            return _M_Soup.MusicLibrary._op_playPauseSong.invokeAsync(self, ((port, ), context))
-
-        def begin_playPauseSong(self, port, _response=None, _ex=None, _sent=None, context=None):
-            return _M_Soup.MusicLibrary._op_playPauseSong.begin(self, ((port, ), _response, _ex, _sent, context))
-
-        def end_playPauseSong(self, _r):
-            return _M_Soup.MusicLibrary._op_playPauseSong.end(self, _r)
-
         @staticmethod
         def checkedCast(proxy, facetOrContext=None, context=None):
             return _M_Soup.MusicLibraryPrx.ice_checkedCast(proxy, '::Soup::MusicLibrary', facetOrContext, context)
@@ -230,9 +218,6 @@ if 'MusicLibraryPrx' not in _M_Soup.__dict__:
         def stopSong(self, port, current=None):
             raise NotImplementedError("servant method 'stopSong' not implemented")
 
-        def playPauseSong(self, port, current=None):
-            raise NotImplementedError("servant method 'playPauseSong' not implemented")
-
         def __str__(self):
             return IcePy.stringify(self, _M_Soup._t_MusicLibraryDisp)
 
@@ -248,7 +233,6 @@ if 'MusicLibraryPrx' not in _M_Soup.__dict__:
     MusicLibrary._op_searchWithText = IcePy.Operation('searchWithText', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), IcePy._t_string, False, 0),), (), ((), _M_Soup._t_Songs, False, 0), ())
     MusicLibrary._op_playSong = IcePy.Operation('playSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), _M_Soup._t_Song, False, 0),), (), ((), IcePy._t_int, False, 0), ())
     MusicLibrary._op_stopSong = IcePy.Operation('stopSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), IcePy._t_int, False, 0),), (), None, ())
-    MusicLibrary._op_playPauseSong = IcePy.Operation('playPauseSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), IcePy._t_int, False, 0),), (), None, ())
 
     _M_Soup.MusicLibrary = MusicLibrary
     del MusicLibrary
