@@ -1,6 +1,5 @@
 import time
 import vlc
-from vlc import MediaPlayer
 
 # Créer une instance VLC
 instance = vlc.Instance()

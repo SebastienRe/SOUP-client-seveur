@@ -40,35 +40,35 @@ class SongFiles():
         with open(f"{self.dossier_musiques}/{song.id}-{song.title}-{song.author}.{song.extension}", "wb") as f:
             f.write(bytearray())
     
-    def ajouterMusique(self, title : str, author : str, extension : str):
+    def ajouterMusique(self, title : str, author : str, type : str, extension : str):
         """
         Ajoute une musique dans le dossier musiques
         """
         # création du fichier
         
         id = self.get_new_id()
-        song = Song(id, title, author, extension, 0)
+        song = Song(id, title, author, type, extension, 0)
         self.ajouterMusiqueS(song)
         return song
     
-    def editionDonneesMusique(self, id : int, data: bytearray):
+    def editionDonneesMusique(self, song: Song, data: bytearray):
         """
         Modifie les données d'une musique
         """
-        with open(f"{self.dossier_musiques}/{id}.mp3", "wb") as f:
+        with open(f"{self.dossier_musiques}/{id}-{song.title}-{song.author}-.{song.extension}", "wb") as f:
             f.write(data)
     
-    def addDonneesMusique(self, id : int, data: bytearray, finish: bool, resetMusic: bool):
+    def addDonneesMusique(self, song : Song, data: bytearray, finish: bool, resetMusic: bool):
         """
         Ajoute des données à une musique
         """
         if resetMusic:
-            self.file_data[id] = bytearray()
+            self.file_data[song.id] = bytearray()
         else :
-            self.file_data[id] += data
+            self.file_data[song.id] += data
             
         if finish:
-            self.editionDonneesMusique(id, self.file_data[id])
+            self.editionDonneesMusique(song, self.file_data[song.id])
             del self.file_data[id]
         
             
@@ -110,7 +110,7 @@ class SongFiles():
         for fichier in fichiers:
             id, titre, auteur_and_ext = fichier.split("-")
             auteur, extension = auteur_and_ext.split(".")
-            list.append(Song(int(id), titre, auteur, extension, 0))
+            list.append(Song(int(id), titre, auteur, extension, sous_dossier, 0))
             
         return list       
     
@@ -120,10 +120,10 @@ class MusicLibraryI(Soup.MusicLibrary):
         self.songfiles = SongFiles()
         self.ports_stream = []
         
-    def addSong(self, title : str, author : str, extension : str, current=None):
+    def addSong(self, title : str, author : str, type: str, extension : str, current=None):
         print("Ajout de la musique")
         print(title, author, extension)
-        return self.songfiles.ajouterMusique(title, author, extension)
+        return self.songfiles.ajouterMusique(title, author, type, extension)
 
     def addSongData(self, song : Song, data: bytearray, finish : bool): #// adds the song data to the song
         print("Ajout des données de la musique")
@@ -140,14 +140,20 @@ class MusicLibraryI(Soup.MusicLibrary):
     def searchWithText(self, text, current=None) -> list[Song]:
         print("Recherche par texte")
         songs = self.songfiles.getAlldossier_musiques()
+        if text == "":
+            return songs
         for song in songs:
-            title_match = text in song.title
-            author_match = text in song.author
+            title_match = text.lower() in song.title.lower()
+            author_match = text.lower() in song.author.lower()
             if title_match or author_match:
                 # Calculate the percentage of precision
                 title_precision = len(text) / len(song.title)
                 author_precision = len(text) / len(song.author)
                 song.accuracy = max(title_precision, author_precision)
+                
+            if song.accuracy == 0:
+                songs.remove(song)
+
         print(songs)
         return songs
 
@@ -173,7 +179,7 @@ class MusicLibraryI(Soup.MusicLibrary):
         port = generate_available_port()
         output = 'sout=#transcode{vcodec=none,acodec='+ song.extension +',ab=128,channels=2,samplerate=44100}:http{mux=raw,dst=:' + str(port) + '/}'
         song_name_file = f'{song.id}-{song.title}-{song.author}.{song.extension}'
-        media = instance.media_new(f'musiques/${sous_dossier}/${song_name_file}', output)
+        media = instance.media_new(f'musiques/{sous_dossier}/{song_name_file}', output)
         player.set_media(media)
         player.play()
         self.ports_stream.append({port : player})
@@ -181,7 +187,9 @@ class MusicLibraryI(Soup.MusicLibrary):
     
     def stopSong(self, port, current=None):
         print("Arret de la musique")
-        if self.ports_stream[port]: # Si le port existe
+        print(port, self.ports_stream) # 12346 [{12346: <vlc.MediaPlayer object at 0x000001B1B03B8DA0>}]
+        
+        if port in self.ports_stream: # Check if the port exists
             self.ports_stream[port].stop() # Arreter la musique
             self.ports_stream[port].release() # Libérer le port
             del self.ports_stream[port] # Supprimer le port

@@ -27,11 +27,12 @@ if '_t_songdatas' not in _M_Soup.__dict__:
 if 'Song' not in _M_Soup.__dict__:
     _M_Soup.Song = Ice.createTempClass()
     class Song(object):
-        def __init__(self, id=0, title='', author='', extension='', accuracy=0.0):
+        def __init__(self, id=0, title='', author='', extension='', type='', accuracy=0.0):
             self.id = id
             self.title = title
             self.author = author
             self.extension = extension
+            self.type = type
             self.accuracy = accuracy
 
         def __eq__(self, other):
@@ -47,6 +48,8 @@ if 'Song' not in _M_Soup.__dict__:
                 if self.author != other.author:
                     return False
                 if self.extension != other.extension:
+                    return False
+                if self.type != other.type:
                     return False
                 if self.accuracy != other.accuracy:
                     return False
@@ -65,6 +68,7 @@ if 'Song' not in _M_Soup.__dict__:
         ('title', (), IcePy._t_string),
         ('author', (), IcePy._t_string),
         ('extension', (), IcePy._t_string),
+        ('type', (), IcePy._t_string),
         ('accuracy', (), IcePy._t_float)
     ))
 
@@ -80,14 +84,14 @@ if 'MusicLibraryPrx' not in _M_Soup.__dict__:
     _M_Soup.MusicLibraryPrx = Ice.createTempClass()
     class MusicLibraryPrx(Ice.ObjectPrx):
 
-        def addSong(self, title, author, extension, context=None):
-            return _M_Soup.MusicLibrary._op_addSong.invoke(self, ((title, author, extension), context))
+        def addSong(self, title, author, type, extension, context=None):
+            return _M_Soup.MusicLibrary._op_addSong.invoke(self, ((title, author, type, extension), context))
 
-        def addSongAsync(self, title, author, extension, context=None):
-            return _M_Soup.MusicLibrary._op_addSong.invokeAsync(self, ((title, author, extension), context))
+        def addSongAsync(self, title, author, type, extension, context=None):
+            return _M_Soup.MusicLibrary._op_addSong.invokeAsync(self, ((title, author, type, extension), context))
 
-        def begin_addSong(self, title, author, extension, _response=None, _ex=None, _sent=None, context=None):
-            return _M_Soup.MusicLibrary._op_addSong.begin(self, ((title, author, extension), _response, _ex, _sent, context))
+        def begin_addSong(self, title, author, type, extension, _response=None, _ex=None, _sent=None, context=None):
+            return _M_Soup.MusicLibrary._op_addSong.begin(self, ((title, author, type, extension), _response, _ex, _sent, context))
 
         def end_addSong(self, _r):
             return _M_Soup.MusicLibrary._op_addSong.end(self, _r)
@@ -205,7 +209,7 @@ if 'MusicLibraryPrx' not in _M_Soup.__dict__:
         def ice_staticId():
             return '::Soup::MusicLibrary'
 
-        def addSong(self, title, author, extension, current=None):
+        def addSong(self, title, author, type, extension, current=None):
             raise NotImplementedError("servant method 'addSong' not implemented")
 
         def addSongData(self, song, data, finish, current=None):
@@ -237,7 +241,7 @@ if 'MusicLibraryPrx' not in _M_Soup.__dict__:
     _M_Soup._t_MusicLibraryDisp = IcePy.defineClass('::Soup::MusicLibrary', MusicLibrary, (), None, ())
     MusicLibrary._ice_type = _M_Soup._t_MusicLibraryDisp
 
-    MusicLibrary._op_addSong = IcePy.Operation('addSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), IcePy._t_string, False, 0), ((), IcePy._t_string, False, 0), ((), IcePy._t_string, False, 0)), (), ((), _M_Soup._t_Song, False, 0), ())
+    MusicLibrary._op_addSong = IcePy.Operation('addSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), IcePy._t_string, False, 0), ((), IcePy._t_string, False, 0), ((), IcePy._t_string, False, 0), ((), IcePy._t_string, False, 0)), (), ((), _M_Soup._t_Song, False, 0), ())
     MusicLibrary._op_addSongData = IcePy.Operation('addSongData', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), _M_Soup._t_Song, False, 0), ((), _M_Soup._t_songdatas, False, 0), ((), IcePy._t_bool, False, 0)), (), None, ())
     MusicLibrary._op_updateSong = IcePy.Operation('updateSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), _M_Soup._t_Song, False, 0), ((), IcePy._t_bool, False, 0)), (), None, ())
     MusicLibrary._op_removeSong = IcePy.Operation('removeSong', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), _M_Soup._t_Song, False, 0),), (), None, ())
