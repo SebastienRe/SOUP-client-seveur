@@ -30,8 +30,14 @@ class SongFiles():
         """
         Renvoie un id unique pour une musique
         """
-        fichiers = os.listdir(self.dossier_specifique)
-        return len(fichiers) + 1
+        id = 0
+        dossiers = os.listdir(self.dossier_musiques)
+        for dossier in dossiers:
+            fichiers = os.listdir(os.path.join(self.dossier_musiques, dossier))
+            for fichier in fichiers:
+                id_fichier, titre, auteur_and_ext = fichier.split("-")
+                id = max(id, int(id_fichier))
+        return id + 1
     
     def ajouterMusiqueS(self, song: Song):
         """
