@@ -91,11 +91,14 @@ class SongFiles():
         for fichier in fichiers:
             id_fichier, titre, auteur_and_ext = fichier.split("-")
             if int(id_fichier) == song.id:
-                os.rename(os.path.join(self.dossier_specifique, fichier),
-                          os.path.join(self.dossier_specifique, f"{song.id}-{song.title}-{song.author}.{song.extension}"))
-                if song.type != sous_dossier:
-                    os.rename(os.path.join(self.dossier_specifique, f"{song.id}-{song.title}-{song.author}.{song.extension}"),
-                              os.path.join(self.dossier_musiques, song.type, f"{song.id}-{song.title}-{song.author}.{song.extension}"))
+                try:
+                    os.rename(os.path.join(self.dossier_specifique, fichier),
+                            os.path.join(self.dossier_specifique, f"{song.id}-{song.title}-{song.author}.{song.extension}"))
+                    if song.type != sous_dossier:
+                        os.rename(os.path.join(self.dossier_specifique, f"{song.id}-{song.title}-{song.author}.{song.extension}"),
+                                os.path.join(self.dossier_musiques, song.type, f"{song.id}-{song.title}-{song.author}.{song.extension}"))
+                except PermissionError:
+                    return None
                 return song
             
         if reset:
@@ -135,7 +138,18 @@ class MusicLibraryI(Soup.MusicLibrary):
 
     def updateSong(self, song : Soup, reset:bool, current=None) -> Song:
         print("Modification de la musique")
-        return self.songfiles.modifierMusique(song, reset)
+        
+        port = -1 # Trouver le port de la musique
+        for i in range(len(self.ports_stream)):
+            if self.ports_stream[i]['song'].id == song.id:
+                port = self.ports_stream[i]['port']
+                break
+        if port != -1:
+            self.stopSong(port)
+            
+        song = self.songfiles.modifierMusique(song, reset)
+        if song is None:
+            print("Erreur lors de la modification de la musique")
         
     def removeSong(self, song : Song, current=None):
         print("Suppression de la musique")
@@ -155,7 +169,7 @@ class MusicLibraryI(Soup.MusicLibrary):
                 author_precision = len(text) / len(song.author)
                 song.accuracy = max(title_precision, author_precision)
                 
-            if song.accuracy == 0:
+            if song.accuracy != 1:
                 songs.remove(song)
 
         print(songs)
@@ -183,21 +197,24 @@ class MusicLibraryI(Soup.MusicLibrary):
         port = generate_available_port()
         output = 'sout=#transcode{vcodec=none,acodec='+ song.extension +',ab=128,channels=2,samplerate=44100}:http{mux=raw,dst=:' + str(port) + '/}'
         song_name_file = f'{song.id}-{song.title}-{song.author}.{song.extension}'
-        media = instance.media_new(f'musiques/{sous_dossier}/{song_name_file}', output)
+        media = instance.media_new(f'backend/musiques/{sous_dossier}/{song_name_file}', output)
         player.set_media(media)
         player.play()
-        self.ports_stream.append({port : player})
+        self.ports_stream.append({'port' : port, 'player': player, 'song' : song})
         return port
     
     def stopSong(self, port, current=None):
         print("Arret de la musique")
-        print(port, self.ports_stream) # 12346 [{12346: <vlc.MediaPlayer object at 0x000001B1B03B8DA0>}]
+        print(port, port in self.ports_stream, self.ports_stream) # 12346 [{12346: <vlc.MediaPlayer object at 0x000001B1B03B8DA0>}]
         
-        if port in self.ports_stream: # Check if the port exists
-            self.ports_stream[port].stop() # Arreter la musique
-            self.ports_stream[port].release() # Libérer le port
-            del self.ports_stream[port] # Supprimer le port
-        return
+        for i in range(len(self.ports_stream)):
+            if self.ports_stream[i]['port'] == port:
+                player = self.ports_stream[i]['player']
+                player.stop()
+                player.release()
+                del self.ports_stream[i]
+                return
+        print("Erreur lors de l'arrêt de la musique")
 
 with Ice.initialize() as communicator:
     adapter = communicator.createObjectAdapterWithEndpoints("MusicLibraryAdapter", "ws -p " + str(port)) # Création de l'adaptateur qui sert à communiquer avec le client
@@ -206,5 +223,5 @@ with Ice.initialize() as communicator:
     adapter.activate() # Activation de l'adaptateur
     communicator.waitForShutdown() # Attente de la fin du programme
     
-#\cmd>python serveur.py 10000 rock
-#\cmd>python serveur.py 10001 epic
+#\cmd>python backend/serveur.py 10000 rock
+#\cmd>python backend/serveur.py 10001 epic
