@@ -1,5 +1,6 @@
 import socket
 import Ice
+import Glacier2
 import Soup as Soup
 from Soup import Song
 import os
@@ -223,6 +224,7 @@ class MusicLibraryI(Soup.MusicLibrary):
         print("Erreur lors de l'arrêt de la musique")
 
 with Ice.initialize() as communicator:
+    
     adapter = communicator.createObjectAdapterWithEndpoints("MusicLibraryAdapter", "ws -p " + str(port)) # Création de l'adaptateur qui sert à communiquer avec le client
     object = MusicLibraryI() # Création de l'objet servant
     adapter.add(object, communicator.stringToIdentity("MusicLibrary")) # Ajout de l'objet servant à l'adaptateur
